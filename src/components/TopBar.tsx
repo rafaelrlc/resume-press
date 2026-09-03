@@ -16,7 +16,7 @@ export function TopBar({ doc, onImport }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header className="relative z-30 flex h-14 shrink-0 items-center gap-3 border-b border-white/10 bg-ink px-4 sm:px-5">
+    <header className="relative z-30 flex h-12 shrink-0 items-center gap-3 border-b border-white/10 bg-ink px-4 sm:px-5">
       <Wordmark />
 
       <span aria-hidden className="hidden h-5 w-px bg-white/15 sm:block" />

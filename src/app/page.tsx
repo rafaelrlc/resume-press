@@ -52,7 +52,7 @@ export default function Page() {
         </main>
 
         <section
-          className={`min-h-0 w-full shrink-0 lg:block lg:w-[47%] lg:max-w-[680px] ${
+          className={`min-h-0 w-full shrink-0 lg:block lg:w-[54%] lg:max-w-[860px] ${
             view === "edit" ? "hidden" : "block"
           }`}
         >

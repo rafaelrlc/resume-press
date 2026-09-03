@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useSyncExternalStore } from "react";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import {
@@ -10,7 +10,10 @@ import {
   type ArraySectionId,
   type Resume,
 } from "./schema";
+import { SECTIONS } from "./sections";
 import { TEMPLATE_IDS, type TemplateId } from "@/templates";
+
+const DEFAULT_SECTION_ORDER = SECTIONS.map((s) => s.id);
 
 /**
  * Everything lives in the browser. `persist` writes the whole workspace to
@@ -42,6 +45,13 @@ export type Doc = {
    * A missing or blank key falls back to the built-in English title.
    */
   sectionTitles: Record<string, string>;
+  /**
+   * Print order for the array sections (not "basics" — the header always
+   * leads). Stored as-is, and reconciled against the live `SECTIONS` list at
+   * read time via `resolvedSectionOrder`, so a section added in a later
+   * build still shows up even in a document saved before it existed.
+   */
+  sectionOrder: ArraySectionId[];
 };
 
 type Workspace = {
@@ -70,6 +80,7 @@ type Actions = {
   setTemplate: (template: TemplateId) => void;
   setAccent: (accent: string) => void;
   setSectionTitle: (id: string, title: string) => void;
+  moveSection: (id: ArraySectionId, delta: -1 | 1) => void;
   replaceResume: (resume: Resume, name?: string) => void;
 };
 
@@ -87,7 +98,31 @@ const makeDoc = (seed?: { name?: string; resume?: Resume }): Doc => ({
   accent: ACCENTS[0],
   resume: seed?.resume ?? emptyResume(),
   sectionTitles: {},
+  sectionOrder: DEFAULT_SECTION_ORDER,
 });
+
+/** The document's section order, with any section it's missing appended. */
+export function resolvedSectionOrder(doc: Pick<Doc, "sectionOrder">): ArraySectionId[] {
+  const known = new Set(DEFAULT_SECTION_ORDER);
+  const kept = doc.sectionOrder.filter((id) => known.has(id));
+  const missing = DEFAULT_SECTION_ORDER.filter((id) => !kept.includes(id));
+  return [...kept, ...missing];
+}
+
+/**
+ * The active document's resolved section order, safe to call from render.
+ * Selects the raw stored array (a stable reference zustand can compare
+ * cheaply) and only reconciles it in a `useMemo` — computing the reconciled
+ * array directly inside a zustand selector hands back a new array identity
+ * on every call, which sends `useSyncExternalStore` into an infinite loop.
+ */
+export function useSectionOrder(): ArraySectionId[] {
+  const raw = useWorkspace((s) => s.docs.find((d) => d.id === s.activeId)?.sectionOrder);
+  return useMemo(
+    () => resolvedSectionOrder({ sectionOrder: raw ?? DEFAULT_SECTION_ORDER }),
+    [raw],
+  );
+}
 
 export const useWorkspace = create<Workspace & Actions>()(
   persist(
@@ -216,6 +251,16 @@ export const useWorkspace = create<Workspace & Actions>()(
           editActive((doc) => {
             if (title.trim()) doc.sectionTitles[id] = title;
             else delete doc.sectionTitles[id];
+          }),
+
+        moveSection: (id, delta) =>
+          editActive((doc) => {
+            const order = resolvedSectionOrder(doc);
+            const index = order.indexOf(id);
+            const target = index + delta;
+            if (target < 0 || target >= order.length) return;
+            [order[index], order[target]] = [order[target], order[index]];
+            doc.sectionOrder = order;
           }),
 
         replaceResume: (resume, name) =>

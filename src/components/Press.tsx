@@ -6,7 +6,7 @@ import { Braces, Download } from "lucide-react";
 import { downloadBlob, slugify } from "@/lib/format";
 import { toJsonResume } from "@/lib/schema";
 import { itemHasContent, SECTIONS } from "@/lib/sections";
-import { ACCENTS, useWorkspace, type Doc } from "@/lib/store";
+import { ACCENTS, resolvedSectionOrder, useWorkspace, type Doc } from "@/lib/store";
 import { TEMPLATES, templateById } from "@/templates";
 
 /**
@@ -25,14 +25,15 @@ export function Press({ doc, onLoadExample }: { doc: Doc; onLoadExample: () => v
   }, [doc]);
 
   // Keyed on the fields that actually reach the page — renaming the document
-  // (or any other change outside these four) must not recompose the PDF.
+  // (or any other change outside these) must not recompose the PDF.
   const document = useMemo(
     () => templateById(settled.template).render({
       resume: settled.resume,
       accent: settled.accent,
       sectionTitles: settled.sectionTitles,
+      sectionOrder: resolvedSectionOrder({ sectionOrder: settled.sectionOrder }),
     }),
-    [settled.template, settled.accent, settled.resume, settled.sectionTitles],
+    [settled.template, settled.accent, settled.resume, settled.sectionTitles, settled.sectionOrder],
   );
 
   const [instance, update] = usePDF({ document });
@@ -59,7 +60,7 @@ export function Press({ doc, onLoadExample }: { doc: Doc; onLoadExample: () => v
 
   return (
     <section className="flex h-full min-h-0 flex-col bg-blue">
-      <div className="on-tint flex flex-wrap items-center gap-x-5 gap-y-3 border-b border-white/15 px-5 py-3">
+      <div className="on-tint flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-white/15 px-5 py-2">
         <div className="flex items-center gap-1.5">
           {TEMPLATES.map((template) => {
             const isActive = template.id === doc.template;
@@ -102,7 +103,7 @@ export function Press({ doc, onLoadExample }: { doc: Doc; onLoadExample: () => v
         </div>
       </div>
 
-      <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden p-4 sm:p-6 lg:p-9">
+      <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden p-3 sm:p-4 lg:p-5">
         {/* Width-led on narrow screens, height-led once there is room, so the
             sheet never grows past its own frame. */}
         <div
@@ -158,7 +159,7 @@ export function Press({ doc, onLoadExample }: { doc: Doc; onLoadExample: () => v
         </div>
       </div>
 
-      <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-t border-white/15 bg-ink px-5 py-3">
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-t border-white/15 bg-ink px-5 py-2">
         <p className="flex items-center gap-2.5">
           <span className="bg-mist px-1.5 py-[3px] font-mono text-[10px] uppercase tracking-[0.14em] text-ink">
             Proof

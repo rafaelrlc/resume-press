@@ -1,6 +1,15 @@
 import { Document, Link, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { dateRange, formatDate, joinNonEmpty, shortUrl } from "@/lib/format";
-import { contactParts, filled, FONTS, has, sectionTitle, type TemplateProps } from "./shared";
+import type { ArraySectionId } from "@/lib/schema";
+import {
+  FONTS,
+  contactParts,
+  filled,
+  has,
+  orderedSections,
+  sectionTitle,
+  type TemplateProps,
+} from "./shared";
 
 /**
  * Macchiato — inspired by jsonresume-theme-macchiato. Warm and unhurried:
@@ -79,7 +88,7 @@ function Bullets({ items }: { items: string[] }) {
   );
 }
 
-export default function Macchiato({ resume, accent, sectionTitles }: TemplateProps) {
+export default function Macchiato({ resume, accent, sectionTitles, sectionOrder }: TemplateProps) {
   const { basics } = resume;
   const contact = contactParts(resume);
 
@@ -94,6 +103,162 @@ export default function Macchiato({ resume, accent, sectionTitles }: TemplatePro
   const languages = filled(resume.languages);
   const interests = filled(resume.interests);
   const references = filled(resume.references);
+
+  const blocks: Partial<Record<ArraySectionId, React.ReactNode>> = {
+    work: work.length > 0 && (
+          <Section title={sectionTitle("work", sectionTitles)} accent={accent}>
+            {work.map((job, i) => (
+              <View key={i} style={s.entry} wrap={false}>
+                <View style={s.entryRow}>
+                  <Text style={s.entryTitle}>{job.position || job.name}</Text>
+                  <Text style={s.dates}>{dateRange(job.startDate, job.endDate)}</Text>
+                </View>
+                <Text style={s.entryMeta}>
+                  {joinNonEmpty([job.position ? job.name : "", job.location])}
+                </Text>
+                {has(job.summary) && <Text style={s.summary}>{job.summary}</Text>}
+                <Bullets items={job.highlights} />
+              </View>
+            ))}
+          </Section>
+    ),
+    projects: projects.length > 0 && (
+          <Section title={sectionTitle("projects", sectionTitles)} accent={accent}>
+            {projects.map((project, i) => (
+              <View key={i} style={s.entry} wrap={false}>
+                <View style={s.entryRow}>
+                  <Text style={s.entryTitle}>{project.name}</Text>
+                  <Text style={s.dates}>{dateRange(project.startDate, project.endDate)}</Text>
+                </View>
+                {has(project.url) && (
+                  <Link src={project.url} style={[s.entryMeta, s.link]}>
+                    {shortUrl(project.url)}
+                  </Link>
+                )}
+                {has(project.description) && <Text style={s.summary}>{project.description}</Text>}
+                <Bullets items={project.highlights} />
+                {project.keywords.filter(Boolean).length > 0 && (
+                  <Text style={s.keywords}>{project.keywords.filter(Boolean).join("  ·  ")}</Text>
+                )}
+              </View>
+            ))}
+          </Section>
+    ),
+    education: education.length > 0 && (
+          <Section title={sectionTitle("education", sectionTitles)} accent={accent}>
+            {education.map((school, i) => (
+              <View key={i} style={s.entry} wrap={false}>
+                <View style={s.entryRow}>
+                  <Text style={s.entryTitle}>{school.institution}</Text>
+                  <Text style={s.dates}>{dateRange(school.startDate, school.endDate)}</Text>
+                </View>
+                <Text style={s.entryMeta}>
+                  {joinNonEmpty([school.studyType, school.area], ", ")}
+                </Text>
+                {school.courses.filter(Boolean).length > 0 && (
+                  <Text style={s.keywords}>{school.courses.filter(Boolean).join("  ·  ")}</Text>
+                )}
+              </View>
+            ))}
+          </Section>
+    ),
+    skills: skills.length > 0 && (
+          <Section title={sectionTitle("skills", sectionTitles)} accent={accent}>
+            {skills.map((skill, i) => (
+              <View key={i} style={s.skillRow}>
+                <Text style={s.skillLabel}>{skill.name}</Text>
+                <Text style={s.skillValue}>{skill.keywords.filter(Boolean).join(", ")}</Text>
+              </View>
+            ))}
+          </Section>
+    ),
+    publications: publications.length > 0 && (
+          <Section title={sectionTitle("publications", sectionTitles)} accent={accent}>
+            {publications.map((item, i) => (
+              <View key={i} style={s.entry} wrap={false}>
+                <View style={s.entryRow}>
+                  <Text style={s.entryTitle}>{item.name}</Text>
+                  <Text style={s.dates}>{formatDate(item.releaseDate)}</Text>
+                </View>
+                <Text style={s.entryMeta}>{item.publisher}</Text>
+                {has(item.summary) && <Text style={s.summary}>{item.summary}</Text>}
+              </View>
+            ))}
+          </Section>
+    ),
+    awards: awards.length > 0 && (
+          <Section title={sectionTitle("awards", sectionTitles)} accent={accent}>
+            {awards.map((award, i) => (
+              <View key={i} style={s.entry} wrap={false}>
+                <View style={s.entryRow}>
+                  <Text style={s.entryTitle}>{award.title}</Text>
+                  <Text style={s.dates}>{formatDate(award.date)}</Text>
+                </View>
+                <Text style={s.entryMeta}>{award.awarder}</Text>
+                {has(award.summary) && <Text style={s.summary}>{award.summary}</Text>}
+              </View>
+            ))}
+          </Section>
+    ),
+    certificates: certificates.length > 0 && (
+          <Section title={sectionTitle("certificates", sectionTitles)} accent={accent}>
+            {certificates.map((item, i) => (
+              <View key={i} style={s.entryRow}>
+                <Text>
+                  <Text style={s.entryTitle}>{item.name}</Text>
+                  {item.issuer ? `  —  ${item.issuer}` : ""}
+                </Text>
+                <Text style={s.dates}>{formatDate(item.date)}</Text>
+              </View>
+            ))}
+          </Section>
+    ),
+    volunteer: volunteer.length > 0 && (
+          <Section title={sectionTitle("volunteer", sectionTitles)} accent={accent}>
+            {volunteer.map((item, i) => (
+              <View key={i} style={s.entry} wrap={false}>
+                <View style={s.entryRow}>
+                  <Text style={s.entryTitle}>{item.position || item.organization}</Text>
+                  <Text style={s.dates}>{dateRange(item.startDate, item.endDate)}</Text>
+                </View>
+                {item.position ? <Text style={s.entryMeta}>{item.organization}</Text> : null}
+                {has(item.summary) && <Text style={s.summary}>{item.summary}</Text>}
+                <Bullets items={item.highlights} />
+              </View>
+            ))}
+          </Section>
+    ),
+    languages: languages.length > 0 && (
+          <Section title={sectionTitle("languages", sectionTitles)} accent={accent}>
+            <Text>
+              {languages
+                .map((l) => joinNonEmpty([l.language, l.fluency], " — "))
+                .filter(Boolean)
+                .join("   ·   ")}
+            </Text>
+          </Section>
+    ),
+    interests: interests.length > 0 && (
+          <Section title={sectionTitle("interests", sectionTitles)} accent={accent}>
+            {interests.map((item, i) => (
+              <View key={i} style={s.skillRow}>
+                <Text style={s.skillLabel}>{item.name}</Text>
+                <Text style={s.skillValue}>{item.keywords.filter(Boolean).join(", ")}</Text>
+              </View>
+            ))}
+          </Section>
+    ),
+    references: references.length > 0 && (
+          <Section title={sectionTitle("references", sectionTitles)} accent={accent}>
+            {references.map((item, i) => (
+              <View key={i} style={s.entry}>
+                <Text style={s.entryTitle}>{item.name}</Text>
+                <Text style={s.entryMeta}>{item.reference}</Text>
+              </View>
+            ))}
+          </Section>
+    ),
+  };
 
   return (
     <Document title={basics.name || "Résumé"} author={basics.name}>
@@ -124,169 +289,7 @@ export default function Macchiato({ resume, accent, sectionTitles }: TemplatePro
           </Section>
         )}
 
-        {work.length > 0 && (
-          <Section title={sectionTitle("work", sectionTitles)} accent={accent}>
-            {work.map((job, i) => (
-              <View key={i} style={s.entry} wrap={false}>
-                <View style={s.entryRow}>
-                  <Text style={s.entryTitle}>{job.position || job.name}</Text>
-                  <Text style={s.dates}>{dateRange(job.startDate, job.endDate)}</Text>
-                </View>
-                <Text style={s.entryMeta}>
-                  {joinNonEmpty([job.position ? job.name : "", job.location])}
-                </Text>
-                {has(job.summary) && <Text style={s.summary}>{job.summary}</Text>}
-                <Bullets items={job.highlights} />
-              </View>
-            ))}
-          </Section>
-        )}
-
-        {projects.length > 0 && (
-          <Section title={sectionTitle("projects", sectionTitles)} accent={accent}>
-            {projects.map((project, i) => (
-              <View key={i} style={s.entry} wrap={false}>
-                <View style={s.entryRow}>
-                  <Text style={s.entryTitle}>{project.name}</Text>
-                  <Text style={s.dates}>{dateRange(project.startDate, project.endDate)}</Text>
-                </View>
-                {has(project.url) && (
-                  <Link src={project.url} style={[s.entryMeta, s.link]}>
-                    {shortUrl(project.url)}
-                  </Link>
-                )}
-                {has(project.description) && <Text style={s.summary}>{project.description}</Text>}
-                <Bullets items={project.highlights} />
-                {project.keywords.filter(Boolean).length > 0 && (
-                  <Text style={s.keywords}>{project.keywords.filter(Boolean).join("  ·  ")}</Text>
-                )}
-              </View>
-            ))}
-          </Section>
-        )}
-
-        {education.length > 0 && (
-          <Section title={sectionTitle("education", sectionTitles)} accent={accent}>
-            {education.map((school, i) => (
-              <View key={i} style={s.entry} wrap={false}>
-                <View style={s.entryRow}>
-                  <Text style={s.entryTitle}>{school.institution}</Text>
-                  <Text style={s.dates}>{dateRange(school.startDate, school.endDate)}</Text>
-                </View>
-                <Text style={s.entryMeta}>
-                  {joinNonEmpty([school.studyType, school.area], ", ")}
-                </Text>
-                {school.courses.filter(Boolean).length > 0 && (
-                  <Text style={s.keywords}>{school.courses.filter(Boolean).join("  ·  ")}</Text>
-                )}
-              </View>
-            ))}
-          </Section>
-        )}
-
-        {skills.length > 0 && (
-          <Section title={sectionTitle("skills", sectionTitles)} accent={accent}>
-            {skills.map((skill, i) => (
-              <View key={i} style={s.skillRow}>
-                <Text style={s.skillLabel}>{skill.name}</Text>
-                <Text style={s.skillValue}>{skill.keywords.filter(Boolean).join(", ")}</Text>
-              </View>
-            ))}
-          </Section>
-        )}
-
-        {publications.length > 0 && (
-          <Section title={sectionTitle("publications", sectionTitles)} accent={accent}>
-            {publications.map((item, i) => (
-              <View key={i} style={s.entry} wrap={false}>
-                <View style={s.entryRow}>
-                  <Text style={s.entryTitle}>{item.name}</Text>
-                  <Text style={s.dates}>{formatDate(item.releaseDate)}</Text>
-                </View>
-                <Text style={s.entryMeta}>{item.publisher}</Text>
-                {has(item.summary) && <Text style={s.summary}>{item.summary}</Text>}
-              </View>
-            ))}
-          </Section>
-        )}
-
-        {awards.length > 0 && (
-          <Section title={sectionTitle("awards", sectionTitles)} accent={accent}>
-            {awards.map((award, i) => (
-              <View key={i} style={s.entry} wrap={false}>
-                <View style={s.entryRow}>
-                  <Text style={s.entryTitle}>{award.title}</Text>
-                  <Text style={s.dates}>{formatDate(award.date)}</Text>
-                </View>
-                <Text style={s.entryMeta}>{award.awarder}</Text>
-                {has(award.summary) && <Text style={s.summary}>{award.summary}</Text>}
-              </View>
-            ))}
-          </Section>
-        )}
-
-        {certificates.length > 0 && (
-          <Section title={sectionTitle("certificates", sectionTitles)} accent={accent}>
-            {certificates.map((item, i) => (
-              <View key={i} style={s.entryRow}>
-                <Text>
-                  <Text style={s.entryTitle}>{item.name}</Text>
-                  {item.issuer ? `  —  ${item.issuer}` : ""}
-                </Text>
-                <Text style={s.dates}>{formatDate(item.date)}</Text>
-              </View>
-            ))}
-          </Section>
-        )}
-
-        {volunteer.length > 0 && (
-          <Section title={sectionTitle("volunteer", sectionTitles)} accent={accent}>
-            {volunteer.map((item, i) => (
-              <View key={i} style={s.entry} wrap={false}>
-                <View style={s.entryRow}>
-                  <Text style={s.entryTitle}>{item.position || item.organization}</Text>
-                  <Text style={s.dates}>{dateRange(item.startDate, item.endDate)}</Text>
-                </View>
-                {item.position ? <Text style={s.entryMeta}>{item.organization}</Text> : null}
-                {has(item.summary) && <Text style={s.summary}>{item.summary}</Text>}
-                <Bullets items={item.highlights} />
-              </View>
-            ))}
-          </Section>
-        )}
-
-        {languages.length > 0 && (
-          <Section title={sectionTitle("languages", sectionTitles)} accent={accent}>
-            <Text>
-              {languages
-                .map((l) => joinNonEmpty([l.language, l.fluency], " — "))
-                .filter(Boolean)
-                .join("   ·   ")}
-            </Text>
-          </Section>
-        )}
-
-        {interests.length > 0 && (
-          <Section title={sectionTitle("interests", sectionTitles)} accent={accent}>
-            {interests.map((item, i) => (
-              <View key={i} style={s.skillRow}>
-                <Text style={s.skillLabel}>{item.name}</Text>
-                <Text style={s.skillValue}>{item.keywords.filter(Boolean).join(", ")}</Text>
-              </View>
-            ))}
-          </Section>
-        )}
-
-        {references.length > 0 && (
-          <Section title={sectionTitle("references", sectionTitles)} accent={accent}>
-            {references.map((item, i) => (
-              <View key={i} style={s.entry}>
-                <Text style={s.entryTitle}>{item.name}</Text>
-                <Text style={s.entryMeta}>{item.reference}</Text>
-              </View>
-            ))}
-          </Section>
-        )}
+        {orderedSections(blocks, sectionOrder)}
       </Page>
     </Document>
   );
