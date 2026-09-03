@@ -1,26 +1,213 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /*
+   * Charcoal chrome, a single teal accent, light paper. `ink` is now a
+   * neutral — dark chrome fill and ordinary text colour, not a highlight —
+   * so `mist` (the teal) carries every accent job on its own: the press
+   * stage, the CTA fill, and the pop against both the dark chrome and the
+   * light paper alike.
+   */
+  --color-ink: #222831;
+  --color-ink-2: #31363f;
+  --color-ink-3: #3d4550;
+  --color-blue: #76abae;
+  --color-blue-deep: #55797c;
+  --color-mist: #76abae;
+  --color-bone: #eeeeee;
+  --color-bone-2: #e2e2e2;
+  --color-bone-3: #76abae;
+  --color-paper: #ffffff;
+
+  --font-display: var(--font-display-face), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-body-face), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-face), ui-monospace, SFMono-Regular, monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  height: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-ink);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-ink);
+  color: #fff;
+}
+
+/*
+ * One focus treatment for the light (bone/paper) surfaces most controls sit
+ * on. `.btn-quiet` lives only on the dark chrome, where ink-on-ink would
+ * vanish, so it gets the pale mist ring instead; `.btn-primary` is filled
+ * with mist itself, so it always takes an ink ring regardless of what's
+ * behind it.
+ */
+:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.btn-quiet:focus-visible,
+.on-tint :focus-visible {
+  outline-color: var(--color-mist);
+}
+
+.btn-primary:focus-visible {
+  outline-color: var(--color-ink);
+}
+
+@layer components {
+  /* Mono micro-caps: every label, counter and piece of job metadata. */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    line-height: 1;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .field-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--color-ink) 62%, transparent);
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  .input {
+    width: 100%;
+    background: var(--color-paper);
+    border: 1px solid var(--color-bone-3);
+    border-radius: 3px;
+    padding: 8px 10px;
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--color-ink);
+    transition: border-color 120ms ease, box-shadow 120ms ease;
+  }
+
+  .input::placeholder {
+    color: color-mix(in srgb, var(--color-ink) 34%, transparent);
+  }
+
+  .input:hover {
+    border-color: color-mix(in srgb, var(--color-ink) 32%, transparent);
+  }
+
+  .input:focus {
+    outline: none;
+    border-color: var(--color-blue);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-blue) 16%, transparent);
+  }
+
+  .input:focus-visible {
+    outline: none;
+  }
+
+  textarea.input {
+    resize: vertical;
+    min-height: 76px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    border-radius: 3px;
+    padding: 7px 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+    white-space: nowrap;
+  }
+
+  .btn-quiet {
+    color: #fff;
+    border-color: color-mix(in srgb, #fff 22%, transparent);
+    background: transparent;
+  }
+
+  .btn-quiet:hover {
+    background: color-mix(in srgb, #fff 10%, transparent);
+    border-color: color-mix(in srgb, #fff 44%, transparent);
+  }
+
+  .btn-paper {
+    color: var(--color-ink);
+    background: var(--color-paper);
+    border-color: var(--color-bone-3);
+  }
+
+  .btn-paper:hover {
+    border-color: var(--color-ink);
+  }
+
+  .btn-primary {
+    color: var(--color-ink);
+    background: var(--color-mist);
+  }
+
+  .btn-primary:hover {
+    background: color-mix(in srgb, var(--color-mist) 78%, var(--color-ink) 12%);
+  }
+
+  .btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  /* Thin, unobtrusive scrollbars so the panels stay quiet. */
+  .scroll-slim {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--color-ink) 26%, transparent) transparent;
+  }
+
+  .scroll-slim::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+  }
+
+  .scroll-slim::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--color-ink) 24%, transparent);
+    border-radius: 99px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+}
+
+@keyframes press-sweep {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.press-sweep {
+  animation: press-sweep 900ms cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

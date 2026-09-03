@@ -9,9 +9,14 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@jsonresume/schema": "^1.3.1",
+    "@react-pdf/renderer": "^4.9.0",
+    "lucide-react": "^1.39.0",
     "next": "16.3.4",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "zod": "^4.5.4",
+    "zustand": "^5.0.15"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
