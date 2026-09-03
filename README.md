@@ -22,7 +22,3 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
-
-## Stack
-
-Next.js · React · TypeScript · Tailwind CSS · Zustand · [`@react-pdf/renderer`](https://react-pdf.org) · [`@jsonresume/schema`](https://www.npmjs.com/package/@jsonresume/schema)
