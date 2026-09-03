@@ -125,10 +125,9 @@ export const SECTIONS: SectionDef[] = [
     title: "Skills",
     itemLabel: "Skill group",
     headKey: "name",
-    subKey: "level",
+    subKey: "keywords",
     fields: [
-      { key: "name", label: "Group", kind: "text", span: 1, placeholder: "Languages" },
-      { key: "level", label: "Level", kind: "text", span: 1, placeholder: "Advanced" },
+      { key: "name", label: "Group", kind: "text", span: 2, placeholder: "Languages" },
       { key: "keywords", label: "Keywords", kind: "tags", span: 2, placeholder: "TypeScript, Go, Rust" },
     ],
   },

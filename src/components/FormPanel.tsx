@@ -21,11 +21,6 @@ type Props = { resume: Resume; panel: PanelId };
 const panelIndex = (panel: PanelId) =>
   panel === "basics" ? 1 : SECTIONS.findIndex((s) => s.id === panel) + 2;
 
-/** "Basics" holds the summary, which prints under a "Profile" heading. */
-const pdfSectionId = (panel: PanelId) => (panel === "basics" ? "profile" : panel);
-const pdfDefaultTitle = (panel: PanelId) =>
-  panel === "basics" ? "Profile" : (SECTION_BY_ID.get(panel)?.title ?? "");
-
 export function FormPanel({ resume, panel }: Props) {
   const title = panel === "basics" ? "Basics" : (SECTION_BY_ID.get(panel)?.title ?? "");
 
@@ -40,11 +35,13 @@ export function FormPanel({ resume, panel }: Props) {
             {title}
           </h2>
         </div>
-        <PdfTitleField
-          key={panel}
-          sectionId={pdfSectionId(panel)}
-          defaultTitle={pdfDefaultTitle(panel)}
-        />
+        {panel !== "basics" && (
+          <PdfTitleField
+            key={panel}
+            sectionId={panel}
+            defaultTitle={SECTION_BY_ID.get(panel)?.title ?? ""}
+          />
+        )}
       </header>
 
       {panel === "basics" ? (
