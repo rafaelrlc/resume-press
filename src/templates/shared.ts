@@ -1,5 +1,4 @@
-import { Fragment } from "react";
-import type { ArraySectionId, Resume } from "@/lib/schema";
+import type { Resume } from "@/lib/schema";
 import { itemHasContent, SECTIONS } from "@/lib/sections";
 
 export type TemplateProps = {
@@ -8,26 +7,7 @@ export type TemplateProps = {
   /** PDF-only header overrides — see `Doc.sectionTitles` for why these live
    * outside the résumé data itself. */
   sectionTitles?: Record<string, string>;
-  /** Print order for the array sections — see `Doc.sectionOrder`. "profile"
-   * (the summary) isn't included: every template pins it right after the
-   * header, since reordering the blurb alongside real sections buys little. */
-  sectionOrder?: ArraySectionId[];
 };
-
-export const DEFAULT_SECTION_ORDER: ArraySectionId[] = SECTIONS.map((s) => s.id);
-
-/**
- * Lay a template's per-section blocks out in the requested order. Each
- * template builds one `block` per section (already gated on "has content" —
- * `false` when empty) and calls this once to render them in sequence.
- */
-export function orderedSections(
-  blocks: Partial<Record<ArraySectionId, React.ReactNode>>,
-  order?: ArraySectionId[],
-): React.ReactNode {
-  const ids = order && order.length ? order : DEFAULT_SECTION_ORDER;
-  return ids.map((id) => <Fragment key={id}>{blocks[id] ?? null}</Fragment>);
-}
 
 /**
  * Every printed section header, in the app's own words. Derived from

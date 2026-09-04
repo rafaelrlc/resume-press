@@ -11,23 +11,25 @@ import {
   LOCATION_FIELDS,
   PROFILE_FIELDS,
   SECTION_BY_ID,
+  SECTIONS,
   type SectionDef,
 } from "@/lib/sections";
-import { useSectionOrder, useWorkspace } from "@/lib/store";
+import { useWorkspace } from "@/lib/store";
 
 type Props = { resume: Resume; panel: PanelId };
 
+const panelIndex = (panel: PanelId) =>
+  panel === "basics" ? 1 : SECTIONS.findIndex((s) => s.id === panel) + 2;
+
 export function FormPanel({ resume, panel }: Props) {
   const title = panel === "basics" ? "Basics" : (SECTION_BY_ID.get(panel)?.title ?? "");
-  const order = useSectionOrder();
-  const panelIndex = panel === "basics" ? 1 : order.indexOf(panel) + 2;
 
   return (
     <div className="mx-auto w-full max-w-[640px] px-6 py-7 sm:px-8">
       <header className="mb-6">
         <div className="flex items-baseline gap-3">
           <span className="eyebrow text-ink">
-            {String(panelIndex).padStart(2, "0")}
+            {String(panelIndex(panel)).padStart(2, "0")}
           </span>
           <h2 className="font-display text-[26px] font-bold leading-none tracking-[-0.02em] text-ink">
             {title}

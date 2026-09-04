@@ -6,7 +6,7 @@ import { Braces, Download } from "lucide-react";
 import { downloadBlob, slugify } from "@/lib/format";
 import { toJsonResume } from "@/lib/schema";
 import { itemHasContent, SECTIONS } from "@/lib/sections";
-import { ACCENTS, resolvedSectionOrder, useWorkspace, type Doc } from "@/lib/store";
+import { ACCENTS, useWorkspace, type Doc } from "@/lib/store";
 import { TEMPLATES, templateById } from "@/templates";
 
 /**
@@ -25,15 +25,14 @@ export function Press({ doc, onLoadExample }: { doc: Doc; onLoadExample: () => v
   }, [doc]);
 
   // Keyed on the fields that actually reach the page — renaming the document
-  // (or any other change outside these) must not recompose the PDF.
+  // (or any other change outside these four) must not recompose the PDF.
   const document = useMemo(
     () => templateById(settled.template).render({
       resume: settled.resume,
       accent: settled.accent,
       sectionTitles: settled.sectionTitles,
-      sectionOrder: resolvedSectionOrder({ sectionOrder: settled.sectionOrder }),
     }),
-    [settled.template, settled.accent, settled.resume, settled.sectionTitles, settled.sectionOrder],
+    [settled.template, settled.accent, settled.resume, settled.sectionTitles],
   );
 
   const [instance, update] = usePDF({ document });
