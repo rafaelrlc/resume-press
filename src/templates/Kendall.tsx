@@ -11,43 +11,43 @@ import { contactParts, filled, FONTS, has, sectionTitle, type TemplateProps } fr
 
 const s = StyleSheet.create({
   page: {
-    paddingTop: 42,
-    paddingBottom: 42,
-    paddingHorizontal: 48,
+    paddingTop: 30,
+    paddingBottom: 26,
+    paddingHorizontal: 44,
     fontFamily: FONTS.sans,
-    fontSize: 9.3,
-    lineHeight: 1.48,
+    fontSize: 9,
+    lineHeight: 1.3,
     color: "#1c1c1c",
   },
-  name: { fontFamily: FONTS.sansBold, fontSize: 20, letterSpacing: -0.2 },
-  headline: { fontFamily: FONTS.sansItalic, fontSize: 10, marginTop: 2, color: "#3a3a3a" },
-  contactRow: { flexDirection: "row", flexWrap: "wrap", marginTop: 8 },
-  contactItem: { fontSize: 8.6, marginRight: 14, color: "#4a4a4a" },
-  contactLink: { fontSize: 8.6, marginRight: 14, color: "#4a4a4a", textDecoration: "none" },
+  name: { fontFamily: FONTS.sansBold, fontSize: 19, letterSpacing: -0.2 },
+  headline: { fontFamily: FONTS.sansItalic, fontSize: 9.6, marginTop: 3, color: "#3a3a3a" },
+  contactRow: { flexDirection: "row", flexWrap: "wrap", marginTop: 5 },
+  contactItem: { fontSize: 8.3, marginRight: 12, color: "#4a4a4a" },
+  contactLink: { fontSize: 8.3, marginRight: 12, color: "#4a4a4a", textDecoration: "none" },
 
   sectionTitle: {
     fontFamily: FONTS.sansBold,
-    fontSize: 9.8,
+    fontSize: 9.4,
     textTransform: "uppercase",
-    letterSpacing: 0.6,
-    paddingBottom: 3,
+    letterSpacing: 0.5,
+    paddingBottom: 2,
     borderBottomWidth: 1,
     borderBottomColor: "#1c1c1c",
   },
-  section: { marginTop: 15 },
-  entry: { marginTop: 9 },
+  section: { marginTop: 8 },
+  entry: { marginTop: 5 },
   entryRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "baseline" },
-  entryTitle: { fontFamily: FONTS.sansBold, fontSize: 10 },
-  entryMeta: { fontFamily: FONTS.sansItalic, fontSize: 9.1, color: "#333333" },
-  dates: { fontSize: 8.6, color: "#6a6a6a" },
-  summary: { marginTop: 2.5 },
-  bullet: { flexDirection: "row", marginTop: 2.5 },
-  bulletMark: { width: 10, fontSize: 8 },
-  keywords: { fontSize: 8.4, color: "#5a5a5a", marginTop: 2.5 },
+  entryTitle: { fontFamily: FONTS.sansBold, fontSize: 9.6 },
+  entryMeta: { fontFamily: FONTS.sansItalic, fontSize: 8.8, color: "#333333" },
+  dates: { fontSize: 8.3, color: "#6a6a6a" },
+  summary: { marginTop: 1.8 },
+  bullet: { flexDirection: "row", marginTop: 1.6 },
+  bulletMark: { width: 10, fontSize: 7.6 },
+  keywords: { fontSize: 8.1, color: "#5a5a5a", marginTop: 1.8 },
   link: { color: "#4a4a4a", textDecoration: "none" },
-  skillRow: { flexDirection: "row", marginTop: 4 },
-  skillLabel: { fontFamily: FONTS.sansBold, width: 130, fontSize: 9 },
-  skillValue: { flex: 1, fontSize: 9 },
+  skillRow: { flexDirection: "row", marginTop: 2.5 },
+  skillLabel: { fontFamily: FONTS.sansBold, width: 124, fontSize: 8.7 },
+  skillValue: { flex: 1, fontSize: 8.7 },
 });
 
 function Section({
@@ -124,7 +124,7 @@ export default function Kendall({ resume, accent, sectionTitles }: TemplateProps
 
         {has(basics.summary) && (
           <Section title={sectionTitle("profile", sectionTitles)} accent={accent}>
-            <Text style={{ marginTop: 6 }}>{basics.summary}</Text>
+            <Text style={{ marginTop: 3 }}>{basics.summary}</Text>
           </Section>
         )}
 
@@ -267,7 +267,7 @@ export default function Kendall({ resume, accent, sectionTitles }: TemplateProps
 
         {languages.length > 0 && (
           <Section title={sectionTitle("languages", sectionTitles)} accent={accent}>
-            <Text style={{ marginTop: 6 }}>
+            <Text style={{ marginTop: 3 }}>
               {languages
                 .map((l) => joinNonEmpty([l.language, l.fluency], " — "))
                 .filter(Boolean)
